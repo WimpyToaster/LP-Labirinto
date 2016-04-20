@@ -11,21 +11,41 @@ flat_list([H | B], Lout) :- flat_list(H, Elem1),
 							flat_list(B, Elem2),
 							append(Elem1, Elem2, Lout).
 
+
+
+
+
+
+
 %Retorna true ou false respetivamente se um elemento esta ou nao nessa lista.
 ha_elem([],[]).
 ha_elem([X | _ ], X).
 ha_elem([ _ | B], X) :- ha_elem(B, X).   
 	
+
+
+
+
+
 	
 %Retorna o elemento da lista na posicao n. A primeira posicao e' 1.
 elem_lista([X | _ ], 1, X).
-elem_lista([ _ | B], Cont, Elem) :- Cont1 is Cont - 1,
-									elem_lista(B, Cont1, Elem).
+elem_lista([ _ | B], Pos, Elem) :- Pos1 is Pos - 1,
+									elem_lista(B, Pos1, Elem).
+
+
+
+
 
 														
 %Retorna o elemento nas coordenadas (X,Y). O primeiro elemento tem cordenadas (1,1).														
 elem_matriz(Matriz, (CoorX, CoorY), Elem_Out) :- elem_lista(Matriz, CoorX, Linha),
-																					  elem_lista(Linha, CoorY, Elem_Out).
+												 elem_lista(Linha, CoorY, Elem_Out).
+
+
+
+
+
 
 %Recebe uma lista com as um subconjunto da seguinte lista: [c,b,e,d]. Nao inclui ela propria e elementos podem estar permutados.																					  
 %Retorna a lista "inversa". 
@@ -33,6 +53,10 @@ elem_matriz(Matriz, (CoorX, CoorY), Elem_Out) :- elem_lista(Matriz, CoorX, Linha
 direcao_possivel([X], Y) :- remove_elem([c,b,e,d], X, Y).
 direcao_possivel([H | B], L_Out) :- direcao_possivel(B, Aux_Out),
 								   remove_elem(Aux_Out, H, L_Out).
+
+
+
+
 
 
 %remove um elemento de uma lista
@@ -43,17 +67,36 @@ remove_elem([H | B], Elem, L_Out) :- Elem == H,
 remove_elem([H | B], Elem, L_Out) :- Elem \== H,
 									remove_elem(B, Elem, Aux),
 									append([H], Aux, L_Out).
+
+
+
+
 															
 %construtor de um movimento
 constroi_mov(D, (X,Y), Mov) :- Mov = (D, X, Y).
 
+/*dada uma lista com direcoes e uma coordenada devolve uma lista com as jogadas*/
 
-%Funcoes principais:		movs_possiveis(LABIRINTO //  POSICAO ATUAL // MOVIMENTOS POSSIVEIS)
+faz_jogada(['c'], (X,Y), L_Out) :- X1 is X - 1, constroi_mov(c, (X1,Y), L_Out).
+faz_jogada(['b'], (X,Y), L_Out) :- X1 is X + 1, constroi_mov(b, (X1,Y), L_Out).
+faz_jogada(['e'], (X,Y), L_Out) :- Y1 is Y - 1, constroi_mov(e, (X,Y1), L_Out).
+faz_jogada(['d'], (X,Y), L_Out) :- Y1 is Y + 1, constroi_mov(d, (X,Y1), L_Out).
+faz_jogada([H | B], (X, Y), L_Out) :- faz_jogada(B, (X,Y), Aux),
+									  faz_jogada([H], (X,Y), Mov),
+									  append([Mov], [Aux], L_Out).
 
-%movs_possiveis(Lab, (X,Y), [H | B], Poss) :- elem_matriz(Lab, (X,Y), L_Direc),
-                                              
-%distancia de dois pontos (enunciado)
-distancia((L1,C1),(L2,C2),Dist):-Dist is abs(L1-L2)+abs(C1-C2).
+/*Funcoes principais:		movs_possiveis(LABIRINTO //  POSICAO ATUAL // MOVIMENTOS // MOVIMENTOS POSSIVEIS)
+*/
+movs_possiveis(Lab, (X,Y), [X], )
+movs_possiveis(Lab, (X,Y), [H | B], Poss) :- elem_matriz(Lab, (X,Y), Celula),
+                                             direcao_possivel(Celula, L_Dir_Poss),
+                                             ha_elem(L_Dir_Poss, H),
+                                             movs_possiveis(Lab, (X,Y), B, Poss).
+movs_possiveis(Lab, (X,Y), [H | B], Poss) :- elem_matriz(Lab, (X,Y), Celula),
+                                             direcao_possivel(Celula, L_Dir_Poss),
+                                             \+ha_elem(L_Dir_Poss, H),
+                                             movs_possiveis(Lab, (X,Y), B, Aux),
+                                             append(H, Aux, Poss).
 
-
-
+/*distancia de dois pontos */
+distancia((L1,C1),(L2,C2),Dist):- Dist is abs(L1-L2) + abs(C1-C2).
