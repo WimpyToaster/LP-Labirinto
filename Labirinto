@@ -100,3 +100,46 @@ movs_possiveis(Lab, (X,Y), [H | B], Poss) :- elem_matriz(Lab, (X,Y), Celula),
 
 /*distancia de dois pontos */
 distancia((L1,C1),(L2,C2),Dist):- Dist is abs(L1-L2) + abs(C1-C2).
+
+%devolve o valor da posicao do tuple de um movimento
+segundo_tuple((_, Y, _), Out) :- Out is Y.
+terceiro_tuple((_, _, Z), Out) :- Out is Z. 
+
+%compara qual o movimento com menor distancia ao final, ou maior distancia ao inicio
+ menor(X, Y, _, Pos_final, Out) :- segundo_tuple(X, L1), terceiro_tuple(X, C1), 
+                                                                       segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
+                                                                       distancia( (L1,C1), Pos_final, S1),
+                                                                       distancia( (L2, C2), Pos_final, S2),
+                                                                       S1 < S2, Out = X.
+ menor(X, Y, _, Pos_final, Out) :- segundo_tuple(X, L1), terceiro_tuple(X, C1), 
+                                                                       segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
+                                                                       distancia( (L1,C1), Pos_final, S1),
+                                                                       distancia( (L2, C2), Pos_final, S2),
+                                                                       S2 < S1, Out = Y.                                                                   
+ menor(X, Y, Pos_inicial, Pos_final, Out) :- segundo_tuple(X, L1), terceiro_tuple(X, C1), 
+                                                                       segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
+                                                                       distancia( (L1,C1), Pos_final, S1),
+                                                                       distancia( (L2, C2), Pos_final, S2),
+                                                                       S1 == S2, maior(X, Y, Pos_inicial, Pos_final, Out).
+ maior(X, Y, Pos_inicial, _, Out) :- segundo_tuple(X, L1), terceiro_tuple(X, C1), 
+                                                                       segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
+                                                                       distancia( (L1,C1), Pos_inicial, S1),
+                                                                       distancia( (L2, C2), Pos_inicial, S2),
+                                                                       S1 > S2, Out = X.
+ maior(X, Y, Pos_inicial, _, Out) :- segundo_tuple(X, L1), terceiro_tuple(X, C1), 
+                                                                       segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
+                                                                       distancia( (L1,C1), Pos_inicial, S1),
+                                                                       distancia( (L2, C2), Pos_inicial, S2),
+                                                                       S2 > S1, Out = Y.
+
+%encotra o movimento minimos dos possiveis 
+ encontra_min([H | B], Pos_inicial, Pos_final, Out) :- encontra_min(B, H, Pos_inicial, Pos_final, Out).
+ encontra_min([C | T], Aux, Pos_inicial, Pos_final, Out) :- menor(C, Aux, Pos_inicial, Pos_final, Aux1),
+                                                                                                 encontra_min(T, Aux1, Pos_inicial, Pos_final, Out).
+ encontra_min([], Aux, _, _, Out) :- Out = Aux .
+
+%ordena_poss(Possiveis,  Possiveis Ordenados, Pos inicial, Pos final)
+
+ordena_poss(Poss, L_Out, Pos_inicial, Pos_final) :- encontra_min(), ordena_poss(Poss, L_Out, Pos_inicial, Pos_final, Aux).
+ordena_poss(Poss, L_Out, Pos_inicial, Pos_final, Aux) :-  remove_elem(Poss, Aux , Poss1), ordena_poss(Poss1, L_Out1, Pos_inicial, Pos_final).
+
