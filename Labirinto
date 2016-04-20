@@ -1,13 +1,59 @@
-%movs_possiveis/4
+%%%%%%%%%%%%%%%%%%%%%%%%
+%      Projeto!!!!!    %
+%%%%%%%%%%%%%%%%%%%%%%%%
 
-movs_possiveis(Lab, Pos_atual, Movs, Poss).
+%Funcoes auxiliares:
+
+%recebe lista de listas, devolve uma lista com todos os elementos.    
+flat_list(X, [X]) :- \+is_list(X).
+flat_list([], []).
+flat_list([H | B], Lout) :- flat_list(H, Elem1),
+							flat_list(B, Elem2),
+							append(Elem1, Elem2, Lout).
+
+%Retorna true ou false respetivamente se um elemento esta ou nao nessa lista.
+ha_elem([],[]).
+ha_elem([X | _ ], X).
+ha_elem([ _ | B], X) :- ha_elem(B, X).   
+	
+	
+%Retorna o elemento da lista na posicao n. A primeira posicao e' 1.
+elem_lista([X | _ ], 1, X).
+elem_lista([ _ | B], Cont, Elem) :- Cont1 is Cont - 1,
+									elem_lista(B, Cont1, Elem).
+
+														
+%Retorna o elemento nas coordenadas (X,Y). O primeiro elemento tem cordenadas (1,1).														
+elem_matriz(Matriz, (CoorX, CoorY), Elem_Out) :- elem_lista(Matriz, CoorX, Linha),
+																					  elem_lista(Linha, CoorY, Elem_Out).
+
+%Recebe uma lista com as um subconjunto da seguinte lista: [c,b,e,d]. Nao inclui ela propria e elementos podem estar permutados.																					  
+%Retorna a lista "inversa". 
+
+direcao_possivel([X], Y) :- remove_elem([c,b,e,d], X, Y).
+direcao_possivel([H | B], L_Out) :- direcao_possivel(B, Aux_Out),
+								   remove_elem(Aux_Out, H, L_Out).
 
 
+%remove um elemento de uma lista
+remove_elem([X], Elem, []) :- X == Elem.
+remove_elem([X], Elem, [X]) :- X \== Elem.
+remove_elem([H | B], Elem, L_Out) :- Elem == H,
+									remove_elem(B, Elem, L_Out).
+remove_elem([H | B], Elem, L_Out) :- Elem \== H,
+									remove_elem(B, Elem, Aux),
+									append([H], Aux, L_Out).
+															
+%construtor de um movimento
+constroi_mov(D, (X,Y), Mov) :- Mov = (D, X, Y).
 
-%distancia/3
 
+%Funcoes principais:		movs_possiveis(LABIRINTO //  POSICAO ATUAL // MOVIMENTOS POSSIVEIS)
+
+%movs_possiveis(Lab, (X,Y), [H | B], Poss) :- elem_matriz(Lab, (X,Y), L_Direc),
+                                              
+%distancia de dois pontos (enunciado)
 distancia((L1,C1),(L2,C2),Dist):-Dist is abs(L1-L2)+abs(C1-C2).
 
-%ordena_poss/4
-%resolve1/4
-%resolve2/4
+
+
