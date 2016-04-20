@@ -138,6 +138,8 @@ terceiro_tuple((_, _, Z), Out) :- Out is Z.
                                                                                                  encontra_min(T, Aux1, Pos_inicial, Pos_final, Out).
  encontra_min([], Aux, _, _, Out) :- Out = Aux .
 
+
+%nao se liga ainda as proximas linhas xD tou quase la :P
 %ordena_poss(Possiveis,  Possiveis Ordenados, Pos inicial, Pos final)
 
 ordena_poss(Poss, L_Out, Pos_inicial, Pos_final) :- encontra_min(), ordena_poss(Poss, L_Out, Pos_inicial, Pos_final, Aux).
