@@ -1,0 +1,13 @@
+%movs_possiveis/4
+
+movs_possiveis(Lab, Pos_atual, Movs, Poss).
+
+
+
+%distancia/3
+
+distancia((L1,C1),(L2,C2),Dist):-Dist is abs(L1-L2)+abs(C1-C2).
+
+%ordena_poss/4
+%resolve1/4
+%resolve2/4
