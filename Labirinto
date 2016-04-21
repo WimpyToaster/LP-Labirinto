@@ -111,7 +111,13 @@ movs_possiveis(Lab, (X,Y), [H | B], Poss) :- elem_matriz(Lab, (X,Y), Celula),
 /*distancia de dois pontos */
 distancia((L1,C1),(L2,C2),Dist):- Dist is abs(L1-L2) + abs(C1-C2).
 
+
 %devolve o valor da posicao do tuple de um movimento
+primeiro_tuple(('c', _ , _ ), Out) :- Out is 'c'.
+primeiro_tuple(('b', _ , _ ), Out) :- Out is 'b'.
+primeiro_tuple(('e', _ , _ ), Out) :- Out is 'e'.
+primeiro_tuple(('d', _ , _ ), Out) :- Out is 'd'.
+
 segundo_tuple((_, Y, _), Out) :- Out is Y.
 terceiro_tuple((_, _, Z), Out) :- Out is Z. 
 
@@ -145,14 +151,21 @@ terceiro_tuple((_, _, Z), Out) :- Out is Z.
 %encotra o movimento minimos dos possiveis 
  encontra_min([H | B], Pos_inicial, Pos_final, Out) :- encontra_min(B, H, Pos_inicial, Pos_final, Out).
  encontra_min([C | T], Aux, Pos_inicial, Pos_final, Out) :- menor(C, Aux, Pos_inicial, Pos_final, Aux1),
-                                                            encontra_min(T, Aux1, Pos_inicial, Pos_final, Out).
+                                                                                                 encontra_min(T, Aux1, Pos_inicial, Pos_final, Out).
  encontra_min([], Aux, _, _, Out) :- Out = Aux .
 
 
-%nao se liga ainda as proximas linhas xD tou quase la :P
 %ordena_poss(Possiveis,  Possiveis Ordenados, Pos inicial, Pos final)
+ordena_poss([],[],_,_).
+ordena_poss(Poss, L_Out, Pos_inicial, Pos_final) :-  encontra_min(Poss, Pos_inicial, Pos_final, Elem),
+                                                                                      remove_elem(Poss, Elem , Poss1), 
+                                                                                      ordena_poss(Poss1, L_Out1, Pos_inicial, Pos_final),
+                                                                                      a_pena(L_Out1, Elem, L_Out).
+ 
 
-ordena_poss(Poss, L_Out, Pos_inicial, Pos_final) :- encontra_min(), ordena_poss(Poss, L_Out, Pos_inicial, Pos_final, Aux).
-ordena_poss(Poss, L_Out, Pos_inicial, Pos_final, Aux) :-  remove_elem(Poss, Aux , Poss1), 
-                                                          ordena_poss(Poss1, L_Out1, Pos_inicial, Pos_final).
 
+
+
+a_pena([X], L, [X | L]).
+a_pena([H | B], L_In, L_Out) :- a_pena(B, L_In, Aux),
+                               a_pena([H], Aux, L_Out).
