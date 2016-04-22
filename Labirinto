@@ -21,6 +21,27 @@ elem_lista([ _ | B], Pos, Elem) :- Pos1 is Pos - 1,
 elem_matriz(Matriz, (CoorX, CoorY), Elem_Out) :- elem_lista(Matriz, CoorX, Linha),
 						    elem_lista(Linha, CoorY, Elem_Out).
 
+
+
+%filtra a primeira lista com os elementos da segunda (mantem os elementos da primeira lista diferentes do da segunda)    filtro( LISTA_INPUT // LISTA_CORTE // LISTA_OUTPUT )
+
+filtro(L_In, [], L_Out) :- L_Out = L_In.
+filtro(L_In, [H | B], L_Out) :- remove_coor(L_In, H, Aux),
+			     filtro(Aux, B, L_Out).
+
+
+
+remove_coor([X], Elem, []) :- coord(X, A), coord(Elem, E), A == E.
+remove_coor([X], Elem, [X]) :- coord(X, A), coord(Elem, E), A \== E.
+remove_coor([H | B], Elem, L_Out) :- coord(Elem, E), coord(H, A), E == A,
+		   			remove_coor(B, Elem, L_Out).
+remove_coor([H | B], Elem, L_Out) :- coord(Elem, E), coord(H,A), E \== A,
+					remove_coor(B, Elem, Aux),
+					a_pena([H], Aux, L_Out).
+
+
+coord((_, X, Y), Out) :- Out = (X,Y).
+
 %Recebe uma lista com as um subconjunto da seguinte lista: [c,b,e,d]. Nao inclui ela propria e elementos podem estar permutados.																					  
 %Retorna a lista "inversa". 
 
@@ -39,7 +60,7 @@ remove_elem([H | B], Elem, L_Out) :- Elem \== H,
 					a_pena([H], Aux, L_Out).
 															
 %construtor de um movimento
-constroi_mov(D, (X,Y), Mov) :- Mov = (D, X, Y).
+constroi_mov(D, (X,Y), Mov) :- Mov = [(D, X, Y)].
 
 /*dada uma lista com direcoes e uma coordenada devolve uma lista com as jogadas*/
 
@@ -49,30 +70,8 @@ faz_jogada(['e'], (X,Y), L_Out) :- Y1 is Y - 1, constroi_mov(e, (X,Y1), L_Out).
 faz_jogada(['d'], (X,Y), L_Out) :- Y1 is Y + 1, constroi_mov(d, (X,Y1), L_Out).
 faz_jogada([H | B], (X, Y), L_Out) :- faz_jogada(B, (X,Y), Aux),
 					faz_jogada([H], (X,Y), Mov),
-					a_pena([Mov], [Aux], L_Out).
+					a_pena(Mov, Aux, L_Out).
 
-
-
-
-
-
-%Funcoes principais:		movs_possiveis(LABIRINTO //  POSICAO ATUAL // MOVIMENTOS // MOVIMENTOS POSSIVEIS)
-movs_possiveis(Lab, (X,Y), Mov, Movs_Poss) :- movs_possiveis(Lab, (X,Y), Mov, Movs_Poss, []).
-movs_possiveis( _ , _ , [Mov], Movs_Poss,Aux) :- remove_elem(Aux, Mov, Movs_Poss).
-movs_possiveis(Lab, (X,Y), [H|B], _, Aux) :- elem_matriz(Lab, (X,Y), Celula),
-                                                                        direcao_possivel(Celula, L_Dir_Poss),    % Output --->   [b,e]
-                                                                        faz_jogada(L_Dir_Poss, (X,Y), L_Jogadas),   % Lista de jogadas possiveis (todas, por filtrar).
-                                                                        movs_possiveis(Lab, (X,Y), B, Aux),
-                                                                        remove_elem(L_Jogadas, H, Aux).
-
-
-
-
-
-
-
-%distancia de dois pontos (enunciado)
-distancia((L1,C1),(L2,C2),Dist):-Dist is abs(L1-L2) + abs(C1-C2).
 
 %devolve o valor da posicao do tuple de um movimento
 primeiro_tuple(('c', _ , _ ), Out) :- Out is 1.
@@ -117,6 +116,27 @@ terceiro_tuple((_, _, Z), Out) :- Out is Z.
  letras(X, Y, _, _, Out) :- (primeiro_tuple(X, L1), primeiro_tuple(Y, L2), L1 < L2, Out = X ); 
                                         (primeiro_tuple(X, L1), primeiro_tuple(Y, L2), L2 < L1, Out = Y ).
 
+ a_pena([],L,L). 
+ a_pena([H|T],L2,[H|L3])  :-  a_pena(T,L2,L3).
+
+
+%Funcoes principais:		movs_possiveis(LABIRINTO //  POSICAO ATUAL // MOVIMENTOS // MOVIMENTOS POSSIVEIS)
+
+movs_possiveis(Lab, (X,Y), Movs, Mov_Poss) :- elem_matriz(Lab, (X,Y), Celula),
+                                                                        direcao_possivel(Celula, L_Dir_Poss),    % Output --->   [b,e]
+                                                                        faz_jogada(L_Dir_Poss, (X,Y), L_Jogadas),   % Lista de jogadas possiveis (todas, por filtrar).
+                                                                        filtro(L_Jogadas, Movs, Mov_Poss).
+
+
+
+
+
+
+
+%distancia de dois pontos (enunciado)
+distancia((L1,C1),(L2,C2),Dist):-Dist is abs(L1-L2) + abs(C1-C2).
+
+
 
 
 %encotra o movimento minimos dos possiveis 
@@ -133,6 +153,3 @@ ordena_poss(Poss, L_Out, Pos_inicial, Pos_final) :-  encontra_min(Poss, Pos_inic
                                                                                       ordena_poss(Poss1, L_Out1, Pos_inicial, Pos_final),
                                                                                       a_pena([Elem], L_Out1, L_Out).
 
-
- a_pena([],L,L). 
- a_pena([H|T],L2,[H|L3])  :-  a_pena(T,L2,L3).
