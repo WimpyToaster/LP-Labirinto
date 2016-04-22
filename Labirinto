@@ -4,12 +4,6 @@
 
 %Funcoes auxiliares:
 
-%recebe lista de listas, devolve uma lista com todos os elementos.    
-flat_list(X, [X]) :- \+is_list(X).
-flat_list([], []).
-flat_list([H | B], Lout) :- flat_list(H, Elem1),
-		            flat_list(B, Elem2),
-			a_pena(Elem1, Elem2, Lout).
 
 %Retorna true ou false respetivamente se um elemento esta ou nao nessa lista.
 ha_elem([],[]).
@@ -57,19 +51,26 @@ faz_jogada([H | B], (X, Y), L_Out) :- faz_jogada(B, (X,Y), Aux),
 					faz_jogada([H], (X,Y), Mov),
 					a_pena([Mov], [Aux], L_Out).
 
-/*Funcoes principais:		movs_possiveis(LABIRINTO //  POSICAO ATUAL // MOVIMENTOS // MOVIMENTOS POSSIVEIS)
-*/
-/*movs_possiveis(Lab, (X,Y), [X], ).
-movs_possiveis(Lab, (X,Y), [H | B], Poss) :- elem_matriz(Lab, (X,Y), Celula),
-                                             direcao_possivel(Celula, L_Dir_Poss),
-                                             ha_elem(L_Dir_Poss, H),
-                                             movs_possiveis(Lab, (X,Y), B, Poss).
-movs_possiveis(Lab, (X,Y), [H | B], Poss) :- elem_matriz(Lab, (X,Y), Celula),
-                                             direcao_possivel(Celula, L_Dir_Poss),
-                                             \+ha_elem(L_Dir_Poss, H),
-                                             movs_possiveis(Lab, (X,Y), B, Aux),
-                                             a_pena(H, Aux, Poss).
-*/
+
+
+
+
+
+%Funcoes principais:		movs_possiveis(LABIRINTO //  POSICAO ATUAL // MOVIMENTOS // MOVIMENTOS POSSIVEIS)
+movs_possiveis(Lab, (X,Y), Mov, Movs_Poss) :- movs_possiveis(Lab, (X,Y), Mov, Movs_Poss, []).
+movs_possiveis( _ , _ , [Mov], Movs_Poss,Aux) :- remove_elem(Aux, Mov, Movs_Poss).
+movs_possiveis(Lab, (X,Y), [H|B], _, Aux) :- elem_matriz(Lab, (X,Y), Celula),
+                                                                        direcao_possivel(Celula, L_Dir_Poss),    % Output --->   [b,e]
+                                                                        faz_jogada(L_Dir_Poss, (X,Y), L_Jogadas),   % Lista de jogadas possiveis (todas, por filtrar).
+                                                                        movs_possiveis(Lab, (X,Y), B, Aux),
+                                                                        remove_elem(L_Jogadas, H, Aux).
+
+
+
+
+
+
+
 %distancia de dois pontos (enunciado)
 distancia((L1,C1),(L2,C2),Dist):-Dist is abs(L1-L2) + abs(C1-C2).
 
