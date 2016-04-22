@@ -1,6 +1,6 @@
-%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%
 %      Projeto!!!!!    %
-%%%%%%%%%%%%%%%%%%%%%%%%
+%%%%%%%%%%%%
 
 %Funcoes auxiliares:
 
@@ -8,79 +8,41 @@
 flat_list(X, [X]) :- \+is_list(X).
 flat_list([], []).
 flat_list([H | B], Lout) :- flat_list(H, Elem1),
-							flat_list(B, Elem2),
-							append(Elem1, Elem2, Lout).
-
-
-
-
-
-%junta 2 listas
-
-a_pena([X], L, [X | L]).
-a_pena([H | B], L_In, L_Out) :- a_pena(B, L_In, Aux),
-                                                     a_pena([H], Aux, L_Out).
-
-
-
-
-
-
+		            flat_list(B, Elem2),
+			a_pena(Elem1, Elem2, Lout).
 
 %Retorna true ou false respetivamente se um elemento esta ou nao nessa lista.
 ha_elem([],[]).
 ha_elem([X | _ ], X).
 ha_elem([ _ | B], X) :- ha_elem(B, X).   
 	
-
-
-
-
-
 	
 %Retorna o elemento da lista na posicao n. A primeira posicao e' 1.
 elem_lista([X | _ ], 1, X).
 elem_lista([ _ | B], Pos, Elem) :- Pos1 is Pos - 1,
-									elem_lista(B, Pos1, Elem).
-
-
-
-
+				   elem_lista(B, Pos1, Elem).
 
 														
 %Retorna o elemento nas coordenadas (X,Y). O primeiro elemento tem cordenadas (1,1).														
 elem_matriz(Matriz, (CoorX, CoorY), Elem_Out) :- elem_lista(Matriz, CoorX, Linha),
-						 elem_lista(Linha, CoorY, Elem_Out).
-
-
-
-
-
+						    elem_lista(Linha, CoorY, Elem_Out).
 
 %Recebe uma lista com as um subconjunto da seguinte lista: [c,b,e,d]. Nao inclui ela propria e elementos podem estar permutados.																					  
 %Retorna a lista "inversa". 
 
 direcao_possivel([X], Y) :- remove_elem([c,b,e,d], X, Y).
 direcao_possivel([H | B], L_Out) :- direcao_possivel(B, Aux_Out),
-				    remove_elem(Aux_Out, H, L_Out).
-
-
-
-
+				  remove_elem(Aux_Out, H, L_Out).
 
 
 %remove um elemento de uma lista
 remove_elem([X], Elem, []) :- X == Elem.
 remove_elem([X], Elem, [X]) :- X \== Elem.
 remove_elem([H | B], Elem, L_Out) :- Elem == H,
-				     remove_elem(B, Elem, L_Out).
+		   			remove_elem(B, Elem, L_Out).
 remove_elem([H | B], Elem, L_Out) :- Elem \== H,
-				     remove_elem(B, Elem, Aux),
-				     a_pena([H], Aux, L_Out).
-
-
-
-
+					remove_elem(B, Elem, Aux),
+					a_pena([H], Aux, L_Out).
 															
 %construtor de um movimento
 constroi_mov(D, (X,Y), Mov) :- Mov = (D, X, Y).
@@ -97,7 +59,7 @@ faz_jogada([H | B], (X, Y), L_Out) :- faz_jogada(B, (X,Y), Aux),
 
 /*Funcoes principais:		movs_possiveis(LABIRINTO //  POSICAO ATUAL // MOVIMENTOS // MOVIMENTOS POSSIVEIS)
 */
-movs_possiveis(Lab, (X,Y), [X], )
+/*movs_possiveis(Lab, (X,Y), [X], ).
 movs_possiveis(Lab, (X,Y), [H | B], Poss) :- elem_matriz(Lab, (X,Y), Celula),
                                              direcao_possivel(Celula, L_Dir_Poss),
                                              ha_elem(L_Dir_Poss, H),
@@ -107,16 +69,15 @@ movs_possiveis(Lab, (X,Y), [H | B], Poss) :- elem_matriz(Lab, (X,Y), Celula),
                                              \+ha_elem(L_Dir_Poss, H),
                                              movs_possiveis(Lab, (X,Y), B, Aux),
                                              a_pena(H, Aux, Poss).
-
-/*distancia de dois pontos */
-distancia((L1,C1),(L2,C2),Dist):- Dist is abs(L1-L2) + abs(C1-C2).
-
+*/
+%distancia de dois pontos (enunciado)
+distancia((L1,C1),(L2,C2),Dist):-Dist is abs(L1-L2) + abs(C1-C2).
 
 %devolve o valor da posicao do tuple de um movimento
-primeiro_tuple(('c', _ , _ ), Out) :- Out is 'c'.
-primeiro_tuple(('b', _ , _ ), Out) :- Out is 'b'.
-primeiro_tuple(('e', _ , _ ), Out) :- Out is 'e'.
-primeiro_tuple(('d', _ , _ ), Out) :- Out is 'd'.
+primeiro_tuple(('c', _ , _ ), Out) :- Out is 1.
+primeiro_tuple(('b', _ , _ ), Out) :- Out is 2.
+primeiro_tuple(('e', _ , _ ), Out) :- Out is 3.
+primeiro_tuple(('d', _ , _ ), Out) :- Out is 4.
 
 segundo_tuple((_, Y, _), Out) :- Out is Y.
 terceiro_tuple((_, _, Z), Out) :- Out is Z. 
@@ -147,6 +108,15 @@ terceiro_tuple((_, _, Z), Out) :- Out is Z.
                                                                        distancia( (L1,C1), Pos_inicial, S1),
                                                                        distancia( (L2, C2), Pos_inicial, S2),
                                                                        S2 > S1, Out = Y.
+ maior(X, Y, Pos_inicial, _, Out) :- segundo_tuple(X, L1), terceiro_tuple(X, C1), 
+                                                                       segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
+                                                                       distancia( (L1,C1), Pos_inicial, S1),
+                                                                       distancia( (L2, C2), Pos_inicial, S2),
+                                                                       S1 == S2, letras(X, Y, _, _, Out).
+ letras(X, Y, _, _, Out) :- (primeiro_tuple(X, L1), primeiro_tuple(Y, L2), L1 < L2, Out = X ); 
+                                        (primeiro_tuple(X, L1), primeiro_tuple(Y, L2), L2 < L1, Out = Y ).
+
+
 
 %encotra o movimento minimos dos possiveis 
  encontra_min([H | B], Pos_inicial, Pos_final, Out) :- encontra_min(B, H, Pos_inicial, Pos_final, Out).
@@ -160,12 +130,8 @@ ordena_poss([],[],_,_).
 ordena_poss(Poss, L_Out, Pos_inicial, Pos_final) :-  encontra_min(Poss, Pos_inicial, Pos_final, Elem),
                                                                                       remove_elem(Poss, Elem , Poss1), 
                                                                                       ordena_poss(Poss1, L_Out1, Pos_inicial, Pos_final),
-                                                                                      a_pena(L_Out1, Elem, L_Out).
- 
+                                                                                      a_pena([Elem], L_Out1, L_Out).
 
 
-
-
-a_pena([X], L, [X | L]).
-a_pena([H | B], L_In, L_Out) :- a_pena(B, L_In, Aux),
-                               a_pena([H], Aux, L_Out).
+ a_pena([],L,L). 
+ a_pena([H|T],L2,[H|L3])  :-  a_pena(T,L2,L3).
