@@ -44,7 +44,7 @@ coord((_, X, Y), Out) :- Out = (X,Y).
 
 %Recebe uma lista com as um subconjunto da seguinte lista: [c,b,e,d]. Nao inclui ela propria e elementos podem estar permutados.																					  
 %Retorna a lista "inversa". 
-
+direcao_possivel([], L_Out) :- L_Out = [c,b,e,d].
 direcao_possivel([X], Y) :- remove_elem([c,b,e,d], X, Y).
 direcao_possivel([H | B], L_Out) :- direcao_possivel(B, Aux_Out),
 				  remove_elem(Aux_Out, H, L_Out).
@@ -152,4 +152,5 @@ ordena_poss(Poss, L_Out, Pos_inicial, Pos_final) :-  encontra_min(Poss, Pos_inic
                                                                                       remove_elem(Poss, Elem , Poss1), 
                                                                                       ordena_poss(Poss1, L_Out1, Pos_inicial, Pos_final),
                                                                                       a_pena([Elem], L_Out1, L_Out).
+
 
