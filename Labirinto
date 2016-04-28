@@ -1,6 +1,6 @@
-%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
 %      Projeto!!!!!    %
-%%%%%%%%%%%%
+%%%%%%%%%%%%%%%%%%%%%%%%
 
 %Funcoes auxiliares:
 
@@ -10,16 +10,20 @@ ha_elem([],[]).
 ha_elem([X | _ ], X).
 ha_elem([ _ | B], X) :- ha_elem(B, X).   
 	
-	
+%Retorna o ultimo elemento de uma lista
+ultimo_elem([], []).
+ultimo_elem([X], X) :- !.
+ultimo_elem([_|B], X) :- ultimo_elem(B, X).
+
 %Retorna o elemento da lista na posicao n. A primeira posicao e' 1.
 elem_lista([X | _ ], 1, X).
 elem_lista([ _ | B], Pos, Elem) :- Pos1 is Pos - 1,
-				   elem_lista(B, Pos1, Elem).
+                                   elem_lista(B, Pos1, Elem).
 
 														
 %Retorna o elemento nas coordenadas (X,Y). O primeiro elemento tem cordenadas (1,1).														
 elem_matriz(Matriz, (CoorX, CoorY), Elem_Out) :- elem_lista(Matriz, CoorX, Linha),
-						    elem_lista(Linha, CoorY, Elem_Out).
+                                                 elem_lista(Linha, CoorY, Elem_Out).
 
 
 
@@ -27,17 +31,21 @@ elem_matriz(Matriz, (CoorX, CoorY), Elem_Out) :- elem_lista(Matriz, CoorX, Linha
 
 filtro(L_In, [], L_Out) :- L_Out = L_In.
 filtro(L_In, [H | B], L_Out) :- remove_coor(L_In, H, Aux),
-			     filtro(Aux, B, L_Out).
+                                filtro(Aux, B, L_Out).
 
 
 
 remove_coor([X], Elem, []) :- coord(X, A), coord(Elem, E), A == E.
 remove_coor([X], Elem, [X]) :- coord(X, A), coord(Elem, E), A \== E.
-remove_coor([H | B], Elem, L_Out) :- coord(Elem, E), coord(H, A), E == A,
-		   			remove_coor(B, Elem, L_Out).
-remove_coor([H | B], Elem, L_Out) :- coord(Elem, E), coord(H,A), E \== A,
-					remove_coor(B, Elem, Aux),
-					a_pena([H], Aux, L_Out).
+remove_coor([H | B], Elem, L_Out) :- coord(Elem, E),
+                                     coord(H, A),
+                                     E == A,
+                                     remove_coor(B, Elem, L_Out).
+remove_coor([H | B], Elem, L_Out) :- coord(Elem, E),
+                                     coord(H,A),
+                                     E \== A,
+                                     remove_coor(B, Elem, Aux),
+                                     a_pena([H], Aux, L_Out).
 
 
 coord((_, X, Y), Out) :- Out = (X,Y).
@@ -45,19 +53,20 @@ coord((_, X, Y), Out) :- Out = (X,Y).
 %Recebe uma lista com as um subconjunto da seguinte lista: [c,b,e,d]. Nao inclui ela propria e elementos podem estar permutados.																					  
 %Retorna a lista "inversa". 
 direcao_possivel([], L_Out) :- L_Out = [c,b,e,d].
-direcao_possivel([X], Y) :- remove_elem([c,b,e,d], X, Y).
-direcao_possivel([H | B], L_Out) :- direcao_possivel(B, Aux_Out),
-				  remove_elem(Aux_Out, H, L_Out).
+direcao_possivel([X], Out) :- remove_elem([c,b,e,d], X, Out).
+direcao_possivel([H | B], L_Out) :- B \== [],
+									direcao_possivel(B, Aux_Out),
+                                    remove_elem(Aux_Out, H, L_Out).
 
 
 %remove um elemento de uma lista
 remove_elem([X], Elem, []) :- X == Elem.
 remove_elem([X], Elem, [X]) :- X \== Elem.
 remove_elem([H | B], Elem, L_Out) :- Elem == H,
-		   			remove_elem(B, Elem, L_Out).
+                                     remove_elem(B, Elem, L_Out).
 remove_elem([H | B], Elem, L_Out) :- Elem \== H,
-					remove_elem(B, Elem, Aux),
-					a_pena([H], Aux, L_Out).
+                                     remove_elem(B, Elem, Aux),
+                                     a_pena([H], Aux, L_Out).
 															
 %construtor de um movimento
 constroi_mov(D, (X,Y), Mov) :- Mov = [(D, X, Y)].
@@ -69,8 +78,8 @@ faz_jogada(['b'], (X,Y), L_Out) :- X1 is X + 1, constroi_mov(b, (X1,Y), L_Out).
 faz_jogada(['e'], (X,Y), L_Out) :- Y1 is Y - 1, constroi_mov(e, (X,Y1), L_Out).
 faz_jogada(['d'], (X,Y), L_Out) :- Y1 is Y + 1, constroi_mov(d, (X,Y1), L_Out).
 faz_jogada([H | B], (X, Y), L_Out) :- faz_jogada(B, (X,Y), Aux),
-					faz_jogada([H], (X,Y), Mov),
-					a_pena(Mov, Aux, L_Out).
+                                      faz_jogada([H], (X,Y), Mov),
+                                      a_pena(Mov, Aux, L_Out).
 
 
 %devolve o valor da posicao do tuple de um movimento
@@ -84,73 +93,101 @@ terceiro_tuple((_, _, Z), Out) :- Out is Z.
 
 %compara qual o movimento com menor distancia ao final, ou maior distancia ao inicio
  menor(X, Y, _, Pos_final, Out) :- segundo_tuple(X, L1), terceiro_tuple(X, C1), 
-                                                                       segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
-                                                                       distancia( (L1,C1), Pos_final, S1),
-                                                                       distancia( (L2, C2), Pos_final, S2),
-                                                                       S1 < S2, Out = X.
+                                   segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
+                                   distancia( (L1,C1), Pos_final, S1),
+                                   distancia( (L2, C2), Pos_final, S2),
+                                   S1 < S2, Out = X.
+
  menor(X, Y, _, Pos_final, Out) :- segundo_tuple(X, L1), terceiro_tuple(X, C1), 
-                                                                       segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
-                                                                       distancia( (L1,C1), Pos_final, S1),
-                                                                       distancia( (L2, C2), Pos_final, S2),
-                                                                       S2 < S1, Out = Y.                                                                   
+                                   segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
+                                   distancia( (L1,C1), Pos_final, S1),
+                                   distancia( (L2, C2), Pos_final, S2),
+                                   S2 < S1, Out = Y.
+
  menor(X, Y, Pos_inicial, Pos_final, Out) :- segundo_tuple(X, L1), terceiro_tuple(X, C1), 
-                                                                       segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
-                                                                       distancia( (L1,C1), Pos_final, S1),
-                                                                       distancia( (L2, C2), Pos_final, S2),
-                                                                       S1 == S2, maior(X, Y, Pos_inicial, Pos_final, Out).
+                                             segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
+                                             distancia( (L1,C1), Pos_final, S1),
+                                             distancia( (L2, C2), Pos_final, S2),
+                                             S1 == S2, maior(X, Y, Pos_inicial, Pos_final, Out).
+
  maior(X, Y, Pos_inicial, _, Out) :- segundo_tuple(X, L1), terceiro_tuple(X, C1), 
-                                                                       segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
-                                                                       distancia( (L1,C1), Pos_inicial, S1),
-                                                                       distancia( (L2, C2), Pos_inicial, S2),
-                                                                       S1 > S2, Out = X.
+                                     segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
+                                     distancia( (L1,C1), Pos_inicial, S1),
+                                     distancia( (L2, C2), Pos_inicial, S2),
+                                     S1 > S2, Out = X.
+
  maior(X, Y, Pos_inicial, _, Out) :- segundo_tuple(X, L1), terceiro_tuple(X, C1), 
-                                                                       segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
-                                                                       distancia( (L1,C1), Pos_inicial, S1),
-                                                                       distancia( (L2, C2), Pos_inicial, S2),
-                                                                       S2 > S1, Out = Y.
+                                     segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
+                                     distancia( (L1,C1), Pos_inicial, S1),
+                                     distancia( (L2, C2), Pos_inicial, S2),
+                                     S2 > S1, Out = Y.
+
  maior(X, Y, Pos_inicial, _, Out) :- segundo_tuple(X, L1), terceiro_tuple(X, C1), 
-                                                                       segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
-                                                                       distancia( (L1,C1), Pos_inicial, S1),
-                                                                       distancia( (L2, C2), Pos_inicial, S2),
-                                                                       S1 == S2, letras(X, Y, _, _, Out).
- letras(X, Y, _, _, Out) :- (primeiro_tuple(X, L1), primeiro_tuple(Y, L2), L1 < L2, Out = X ); 
-                                        (primeiro_tuple(X, L1), primeiro_tuple(Y, L2), L2 < L1, Out = Y ).
+                                     segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
+                                     distancia( (L1,C1), Pos_inicial, S1),
+                                     distancia( (L2, C2), Pos_inicial, S2),
+                                     S1 == S2, letras(X, Y, _, _, Out).
+
+ letras(X, Y, _ , _ , Out) :- (primeiro_tuple(X, L1), primeiro_tuple(Y, L2), L1 < L2, Out = X ); 
+                            (primeiro_tuple(X, L1), primeiro_tuple(Y, L2), L2 < L1, Out = Y ).
 
  a_pena([],L,L). 
- a_pena([H|T],L2,[H|L3])  :-  a_pena(T,L2,L3).
+ a_pena([H | T], L2, [H | L3])  :-  a_pena(T, L2, L3).
+
+%encotra o movimento minimos dos possiveis 
+ encontra_min([H | B], Pos_inicial, Pos_final, Out) :- encontra_min(B, H, Pos_inicial, Pos_final, Out).
+ encontra_min([C | T], Aux, Pos_inicial, Pos_final, Out) :- menor(C, Aux, Pos_inicial, Pos_final, Aux1),
+                                                            encontra_min(T, Aux1, Pos_inicial, Pos_final, Out).
+ encontra_min([], Aux, _, _, Out) :- Out = Aux .
 
 
-%Funcoes principais:		movs_possiveis(LABIRINTO //  POSICAO ATUAL // MOVIMENTOS // MOVIMENTOS POSSIVEIS)
-
-movs_possiveis(Lab, (X,Y), Movs, Mov_Poss) :- elem_matriz(Lab, (X,Y), Celula),
-                                                                        direcao_possivel(Celula, L_Dir_Poss),    % Output --->   [b,e]
-                                                                        faz_jogada(L_Dir_Poss, (X,Y), L_Jogadas),   % Lista de jogadas possiveis (todas, por filtrar).
-                                                                        filtro(L_Jogadas, Movs, Mov_Poss).
+%devolve o proximo movimento possivel e funcao dos feitos
+prox_mov([Elem | _], Elem).
+prox_mov([H|T], Elem) :- H \== Elem,
+                         prox_mov(T, Elem).
 
 
+%Funcoes principais:        movs_possiveis(LABIRINTO //  POSICAO ATUAL // MOVIMENTOS // MOVIMENTOS POSSIVEIS)
 
-
-
+movs_possiveis(Lab, (X,Y), Movs, Movs_Poss) :- elem_matriz(Lab, (X,Y), Celula),
+                                               direcao_possivel(Celula, L_Dir_Poss),    % Output --->   [b,e]
+                                               faz_jogada(L_Dir_Poss, (X,Y), L_Jogadas),   % Lista de jogadas possiveis (todas, por filtrar).
+                                               filtro(L_Jogadas, Movs, Movs_Poss).
 
 
 %distancia de dois pontos (enunciado)
 distancia((L1,C1),(L2,C2),Dist):-Dist is abs(L1-L2) + abs(C1-C2).
 
 
-
-
-%encotra o movimento minimos dos possiveis 
- encontra_min([H | B], Pos_inicial, Pos_final, Out) :- encontra_min(B, H, Pos_inicial, Pos_final, Out).
- encontra_min([C | T], Aux, Pos_inicial, Pos_final, Out) :- menor(C, Aux, Pos_inicial, Pos_final, Aux1),
-                                                                                                 encontra_min(T, Aux1, Pos_inicial, Pos_final, Out).
- encontra_min([], Aux, _, _, Out) :- Out = Aux .
-
-
-%ordena_poss(Possiveis,  Possiveis Ordenados, Pos inicial, Pos final)
+%ordena_poss(Possiveis, Possiveis Ordenados, Pos inicial, Pos final)
 ordena_poss([],[],_,_).
 ordena_poss(Poss, L_Out, Pos_inicial, Pos_final) :-  encontra_min(Poss, Pos_inicial, Pos_final, Elem),
-                                                                                      remove_elem(Poss, Elem , Poss1), 
-                                                                                      ordena_poss(Poss1, L_Out1, Pos_inicial, Pos_final),
-                                                                                      a_pena([Elem], L_Out1, L_Out).
+                                                     remove_elem(Poss, Elem , Poss1), 
+                                                     ordena_poss(Poss1, L_Out1, Pos_inicial, Pos_final),
+                                                     a_pena([Elem], L_Out1, L_Out).
 
 
+
+
+resolve2(Lab, Pos_inicial, Pos_final, Solucao) :- 
+	resolver2(Lab, Pos_inicial, Pos_final, Solucao, []).
+
+resolver2(_, _, Pos_final, Solucao, Movs_ef) :- Movs_ef \== [],
+                                                ultimo_elem(Movs_ef, Pos_actual),
+                                                coord(Pos_actual,Pos_final),
+                                                Solucao = Movs_ef.
+
+resolver2(Lab, (Xi,Yi), Pos_final, Solucao, Movs_ef) :- Movs_ef == [],
+                                                        Mov_inicial = (i,Xi,Yi),
+                                                        resolver2(Lab, (Xi,Yi), Pos_final, Solucao, [Mov_inicial]).
+
+resolver2(Lab, Pos_inicial, Pos_final, Solucao, Movs_ef) :- Movs_ef \== [],
+                                                            ultimo_elem(Movs_ef, Pos_actual),
+                                                            Pos_actual \== [],
+                                                            coord(Pos_actual, Coord_actual),
+                                                            movs_possiveis(Lab, Coord_actual, Movs_ef, Movs_Poss),
+                                                            Movs_Poss \== [],
+                                                            ordena_poss(Movs_Poss, Movs_Poss_Ord, Pos_inicial, Pos_final),
+                                                            prox_mov(Movs_Poss_Ord, Prox_Mov),
+                                                            a_pena(Movs_ef,[Prox_Mov],Aux),
+                                                            resolver2(Lab, Pos_inicial, Pos_final, Solucao, Aux).
