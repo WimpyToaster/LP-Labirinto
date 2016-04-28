@@ -167,8 +167,31 @@ ordena_poss(Poss, L_Out, Pos_inicial, Pos_final) :-  encontra_min(Poss, Pos_inic
                                                      a_pena([Elem], L_Out1, L_Out).
 
 
+%resolve o tabuleiro segundo a regra dos movimentos possiveis.
+resolve1(Lab, Pos_inicial, Pos_final, Solucao) :- resolver1(Lab, Pos_inicial, Pos_final, Solucao, []).
+
+resolver1(_, _, Pos_final, Solucao, Movs_ef) :- Movs_ef \== [],
+                                                ultimo_elem(Movs_ef, Pos_actual),
+                                                coord(Pos_actual,Pos_final),
+                                                Solucao = Movs_ef.
+
+resolver1(Lab, (Xi,Yi), Pos_final, Solucao, Movs_ef) :- Movs_ef == [],
+                                                        Mov_inicial = (i,Xi,Yi),
+                                                        resolver1(Lab, (Xi,Yi), Pos_final, Solucao, [Mov_inicial]).
+
+resolver1(Lab, Pos_inicial, Pos_final, Solucao, Movs_ef) :- Movs_ef \== [],
+                                                            ultimo_elem(Movs_ef, Pos_actual),
+                                                            Pos_actual \== [],
+                                                            coord(Pos_actual, Coord_actual),
+                                                            movs_possiveis(Lab, Coord_actual, Movs_ef, Movs_Poss),
+                                                            Movs_Poss \== [],
+                                                            prox_mov(Movs_Poss, Prox_Mov),
+                                                            a_pena(Movs_ef,[Prox_Mov],Aux),
+                                                            resolver1(Lab, Pos_inicial, Pos_final, Solucao, Aux).
 
 
+
+%resolve o tabuleiro segundo a regra do ordena_poss.
 resolve2(Lab, Pos_inicial, Pos_final, Solucao) :- 
 	resolver2(Lab, Pos_inicial, Pos_final, Solucao, []).
 
