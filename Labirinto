@@ -1,65 +1,68 @@
-   /* * * * * * * * * * * * * * * * * * * *
-    *   Projeto de LP - IST TagusPark     *
-    *        Resolve-Labirintos           *
-    *                                     *
-    *   Autores : Antonio Terra, nº 84702 *
-    *             Miguel Viegas, nº 84747 *
-    *                                     *
-    *   Docentes Responsaveis:            *
-    *             Ines Lynce              *
-    *             Luisa Coheur            *
-    * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * 
+  *   Projeto de LP - IST TagusPark            *
+  *        Resolve-Labirintos                         *
+  *                                                                *
+  *   Autores : Antonio Terra, nº 84702     *
+  *             Miguel Viegas, nº 84747          *
+  *                                                                *
+  *   Docentes Responsaveis:                   *
+  *             Ines Lynce                                 *
+  *             Luisa Coheur                             *
+  * * * * * * * * * * * * * * * * * * * * * * * * * * */
  
 
-     /* * * * * * * * * * * * * * * * * * * *
-      *          Codigo principais          *
-      * * * * * * * * * * * * * * * * * * * */
+     /* * * * * * * * * * * * * * * * * * * * * *
+      *          Codigo principais           *
+      * * * * * * * * * * * * * * * * * * * * * */
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Recebe: Um labiririnto, uma coordenada e uma lista                  *  
- *         de movimentos ja efetuados.                                 *
- * Retorna: Uma lista ordenada com os movimentos possiveis.            *
- * Descricao: A lista e' ordenada segundo a seguinte ordem:            *
- *            Cima (c), Baixo(b), Esquerda(e) e Direita(d).            *
- *            Ou seja, ha direcoes com prioridade.                     *
- *            O labirinto é uma matriz representada por uma            *
+ *         de movimentos ja efetuados.                                                   *
+ * Retorna: Uma lista ordenada com os movimentos possiveis.       *
+ * Descricao: A lista e' ordenada segundo a seguinte ordem:        *
+ *            Cima (c), Baixo(b), Esquerda(e) e Direita(d).                      *
+ *            Ou seja, ha direcoes com prioridade.                                  *
+ *            O labirinto é uma matriz representada por uma                 *
  *            lista de listas, que conteem as paredes de cada celula.  *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
     movs_possiveis(Lab, (X,Y), Movs, Movs_Poss) :- elem_matriz(Lab, (X,Y), Celula),
                                                    direcao_possivel(Celula, L_Dir_Poss),    
                                                    faz_jogada(L_Dir_Poss, (X,Y), L_Jogadas),
                                                    filtro(L_Jogadas, Movs, Movs_Poss).
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * Recebe: Duas coordenadas.                             *
- * Retorna: A distancia (=> 0) entre as coordenadas.     *
- * Descricao: A distancia e' calculada com a soma        *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Recebe: Duas coordenadas.                                         *
+ * Retorna: A distancia (=> 0) entre as coordenadas.    *
+ * Descricao: A distancia e' calculada com a soma      *
  *            dos modulos da diferenca das coordenadas.  *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
     distancia((L1,C1),(L2,C2),Dist) :- Dist is abs(L1-L2) + abs(C1-C2).
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Recebe: Uma lista de movimentos possiveis.        *
- * Retorna: Uma lista ordenada com os mesmos         *
- *          movimentos que recebe.                   *
- * * * * * * * * * * * * * * * * * * * * * * * * * * */
+ * Retorna: Uma lista ordenada com os mesmos     *
+ *          movimentos que recebe.                                *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
     ordena_poss([],[],_,_).
     ordena_poss(Poss, L_Out, Pos_inicial, Pos_final) :-  encontra_min(Poss, Pos_inicial, Pos_final, Elem),
                                                          remove_elem(Poss, Elem , Poss1), 
                                                          ordena_poss(Poss1, L_Out1, Pos_inicial, Pos_final),
                                                          a_pena([Elem], L_Out1, L_Out).
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * Recebe: Um labirinto e as coordenadas do principio    *
- *         e o fim do mesmo.                             *
- * Retorna: A lista contendo a sequencia de jogadas,     *
- *          solucao do labirinto.                        *
- * Descricao: A solucao segue a prioridade de direcao    *
- *            da funcao 'movs_possiveis'.                *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Recebe: Um labirinto e as coordenadas do principio      *
+ *         e o fim do mesmo.                                                         *
+ * Retorna: A lista contendo a sequencia de jogadas,        *
+ *          solucao do labirinto.                                                     *
+ * Descricao: A solucao segue a prioridade de direcao     *
+ *            da funcao 'movs_possiveis'.                                      *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     resolve1(Lab, Pos_inicial, Pos_final, Solucao) :- resolver1(Lab, Pos_inicial, Pos_final, Solucao, []). 
 /* 
     Criou-se uma funcao auxiliar que contem um argumento a mais que guarda os movimentos efetuados.
@@ -87,13 +90,14 @@
 
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- * Recebe: Um labirinto e as coordenadas do principio e o fim do mesmo.            *
- * Retorna: A lista contendo a sequencia de jogadas, solucao do labirinto.         *
- * Descricao: A solucao segue a prioridade de direcao da funcao 'ordena_poss'.     *
- *            Funcao analoga 'a funcao 'resolve1'. Ler documentacao e comentarios  *
- *            da funcao anterior em caso de duvida.                                *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Recebe: Um labirinto e as coordenadas do principio e o fim do mesmo.               *
+ * Retorna: A lista contendo a sequencia de jogadas, solucao do labirinto.              *
+ * Descricao: A solucao segue a prioridade de direcao da funcao 'ordena_poss'.   *
+ *            Funcao analoga 'a funcao 'resolve1'. Ler documentacao e comentarios   *
+ *            da funcao anterior em caso de duvida.                                                            *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+
     resolve2(Lab, Pos_inicial, Pos_final, Solucao) :- resolver2(Lab, Pos_inicial, Pos_final, Solucao, []).
 
     resolver2(_, _, Pos_final, Solucao, Movs_ef) :- Movs_ef \== [],
@@ -122,9 +126,9 @@
 
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  *          Funcoes Auxiliares - Funcionais sobre listas       *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
 
 
 
@@ -190,8 +194,8 @@
 
 /* * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Recebe: Uma lista e um elemento.                  *
- * Retorna: Um elemeto generico da lista.            *
- * Descricao: O elemento e' removido s pertencer 'a  *
+ * Retorna: A lista anterior sem o elemento selecionado.            *
+ * Descricao: O elemento e' removido se pertencer 'a  *
  *            lista. Caso contrario retorna a mesma. *
  * * * * * * * * * * * * * * * * * * * * * * * * * * */
     remove_elem([X], Elem, []) :- X == Elem.
@@ -237,10 +241,12 @@
                                         remove_elem(Aux_Out, H, L_Out).
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
- *          ANTONIO!!!!!                                     *
- *  *         COMENTA ISTO!!!! (corrijo se quiseres depois)  *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * 
+ * Recebe: Uma lista de coordenadas e uma coordenada.                  *
+ * Retorna: A lista sem a coordenada selecionada.            *
+ * Descricao: O elemento e' removido se pertencer 'a  *
+ *            lista. Caso contrario retorna a mesma lista. *
+  * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * ** */
     remove_coor([X], Elem, []) :- coord(X, A), coord(Elem, E), A == E.
     remove_coor([X], Elem, [X]) :- coord(X, A), coord(Elem, E), A \== E.
 
@@ -270,11 +276,11 @@
     constroi_mov(D, (X,Y), Mov) :- Mov = [(D, X, Y)].
 
 
-/* * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
  * Recebe: Uma lista com direcoes e uma coordenada.      *
- * Retorna: Uma lista com as jogadas na coordenada       *
- *          fornecida com as direcoes dadas.             *
- * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
+ * Retorna: Uma lista com as jogadas na coordenada          *
+ *          fornecida com as direcoes dadas.                               *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     faz_jogada(['c'], (X,Y), L_Out) :- X1 is X - 1, constroi_mov(c, (X1,Y), L_Out).
     faz_jogada(['b'], (X,Y), L_Out) :- X1 is X + 1, constroi_mov(b, (X1,Y), L_Out).
     faz_jogada(['e'], (X,Y), L_Out) :- Y1 is Y - 1, constroi_mov(e, (X,Y1), L_Out).
@@ -284,10 +290,14 @@
                                           a_pena(Mov, Aux, L_Out).
 
 
-/* * * * * * * * * * * * * * *
- *         ANTONIO!!!!       *
- *    FAZ ESTA MERDA!!!!!    *
- * * * * * * * * * * * * * * */
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Recebe: Uma coordenada.                                                          *
+ * Retorna: O digito correspondente a cada uma das letras.      *
+ * Descricao: c = 1                                                                               *
+ *                     b = 2                                                                               *
+ *                     e = 3                                                                               *
+ *                     d = 4                                                                               *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     primeiro_tuple(('c', _ , _ ), Out) :- Out is 1.
     primeiro_tuple(('b', _ , _ ), Out) :- Out is 2.
     primeiro_tuple(('e', _ , _ ), Out) :- Out is 3.
@@ -295,23 +305,23 @@
 
 
 /* * * * * * * * * * * * * * *
- *         ANTONIO!!!!       *
- *    FAZ ESTA MERDINHA!!!   *
+ * Recebe: Uma posicao do labirinto.      *
+ * Retorna: O numero da linha.     *
  * * * * * * * * * * * * * * */
     segundo_tuple((_, Y, _), Out) :- Out is Y.
 
 
 /* * * * * * * * * * * * * * *
- *         ANTONIO!!!!       *
- *    FAZ ESTA MERDINHA!!!   *
+ * Recebe: Uma posicao do labirinto.      *
+ * Retorna: O numero da coluna   *
  * * * * * * * * * * * * * * */
     terceiro_tuple((_, _, Z), Out) :- Out is Z. 
 
 
-%compara qual o movimento com menor distancia ao final, ou maior distancia ao inicio
 /* * * * * * * * * * * * * * *
- *         ANTONIO!!!!       *
- *    FAZ ESTA MERDONA!!!    *
+ * Recebe: Duas posicoes do labirinto, a posicao inicial e a posicao final.                   *
+ * Retorna: Qual a posicao com menor distancia a posicao final.                                 *
+ * Descricao: No caso de a distancia a posicao final, esta chama a funcao maior   *
  * * * * * * * * * * * * * * */
     menor(X, Y, _, Pos_final, Out) :- segundo_tuple(X, L1), terceiro_tuple(X, C1), 
                                       segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
@@ -331,8 +341,9 @@
                                                 distancia( (L2, C2), Pos_final, S2),
                                                 S1 == S2, maior(X, Y, Pos_inicial, Pos_final, Out).
 /* * * * * * * * * * * * * * *
- *         ANTONIO!!!!       *
- *    FAZ ESTA MERDONA!!!    *
+ * Recebe: Duas posicoes do labirinto, a posicao inicial e a posicao final.                   *
+ * Retorna: Qual a posicao com maior distancia a posicao inicial.                                 *
+ * Descricao: No caso de a distancia a posicao inical, esta chama a funcao letras   *
  * * * * * * * * * * * * * * */
     maior(X, Y, Pos_inicial, _, Out) :- segundo_tuple(X, L1), terceiro_tuple(X, C1), 
                                         segundo_tuple(Y, L2), terceiro_tuple(Y, C2),
@@ -351,10 +362,11 @@
                                         distancia( (L1,C1), Pos_inicial, S1),
                                         distancia( (L2, C2), Pos_inicial, S2),
                                         S1 == S2, letras(X, Y, _, _, Out).
-/* * * * * * * * * * * * * * *
- *         ANTONIO!!!!       *
- *    FAZ ESTA MERDINHA!!!   *
- * * * * * * * * * * * * * * */
+
+/* * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * *
+ * Recebe: Dois movimentos, a posicao inicial e a posicao final.                                   *
+ * Retorna: Qual o movimento com a letra com maior prioridade.                                *
+ * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * * */
     letras(X, Y, _ , _ , Out) :- (primeiro_tuple(X, L1), primeiro_tuple(Y, L2), L1 < L2, Out = X ); 
                                  (primeiro_tuple(X, L1), primeiro_tuple(Y, L2), L2 < L1, Out = Y ).
 
@@ -362,10 +374,11 @@
 
 
 /* * * * * * * * * * * * * *
- *         ANTONIO!!!!     *
- *    FAZ ESTA MERDA!!!    *
+ * Recebe: Lista de movimentos, a posicao inicial e a posicao final.                   *
+ * Retorna: Qual a posicao com maior prioridade.                                 *
  * * * * * * * * * * * * * */
     encontra_min([H | B], Pos_inicial, Pos_final, Out) :- encontra_min(B, H, Pos_inicial, Pos_final, Out).
     encontra_min([C | T], Aux, Pos_inicial, Pos_final, Out) :- menor(C, Aux, Pos_inicial, Pos_final, Aux1),
                                                                encontra_min(T, Aux1, Pos_inicial, Pos_final, Out).
     encontra_min([], Aux, _, _, Out) :- Out = Aux .
+
